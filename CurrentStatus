@@ -1,0 +1,129 @@
+import Tkinter
+import tkFileDialog 
+from PIL import ImageTk,Image
+import tkMessageBox
+#import subprocess
+import cv2
+import math
+
+class	App:
+    
+    def	__init__(self,	window,	window_title):
+
+        self.window	= window
+        self.window.title(window_title)
+        self.window.configure(bg="lavender")
+
+        self.build_gui("DeepSkyBlue2","Calibri 14 bold")
+
+
+        self.window.mainloop()
+
+	
+    def add_image(self):
+
+        path = tkFileDialog.askopenfilename()
+    	splitted_path = path.split('/')
+        extension  = splitted_path[len(splitted_path)-1].split('.')[1]
+
+        if not self.valid_ext(extension):
+
+        	tkMessageBox.showerror("Error","The file type is not supported , please try again")
+
+        else:
+        	
+        	global img 
+	        img = Image.open(path)
+	        original_w , original_h = img.width , img.height
+	        dim = (original_w,original_h)
+	        print "Original Resolution : {} x {}".format(dim[0],dim[1])
+	        
+	        if original_w>900 or original_h>900:
+	            dim = self.resize_res(original_w,original_h)
+	            img.thumbnail(dim,Image.ANTIALIAS)
+
+	        photo = ImageTk.PhotoImage(img)
+	        self.ImageLabel.configure(image=photo)
+	        self.ImageLabel.image=photo
+	        self.ImageLabel.configure(width=img.width,height=img.height)
+	        print "Resized Resolution : {} x {}".format(dim[0],dim[1])
+	        self.b_choose.configure(text="Change Image")	
+
+
+
+    def resize_res(self,width,height):
+        w,h=width,height
+        while w>900 or h>900:
+            w=math.floor(w/1.5)
+            h=math.floor(h/1.5)
+        return (w,h)
+
+
+			
+    def valid_ext(self,ext):
+
+    	if ext=="png" or ext=="jpg" or ext=="jpeg" or ext=="jpe" or ext=="bmp" or ext=="dib" or ext=="jp2":
+    		return True
+    	return False
+
+
+    def explorer(self):
+        path = tkFileDialog.askdirectory()
+        print path
+
+
+    def close(self):
+        self.window.destroy()
+
+    def build_gui(self,color,font):
+
+    	self.ImageLabel = Tkinter.Label(self.window,width=80,height=30,borderwidth=3, relief="groove",font="Calibri 14 bold",bg="lavender")
+        self.ImageLabel.grid(row=0, column=0,rowspan=10,columnspan=10)
+
+        filterl = Tkinter.Label(self.window,text="Filters",font=font, fg="navy",bg="lavender")
+        filterl.grid(row=0,column=11, columnspan=5)
+
+        savingl = Tkinter.Label(self.window, text="Saving",font=font,fg="navy",bg="lavender")
+        savingl.grid(row=8,column=11, columnspan=5)
+
+        self.b_choose=Tkinter.Button(self.window, text="Choose Image", width=15 ,height = 3, bg="DodgerBlue4" , fg="white", command = self.add_image , font=font)
+        self.b_choose.grid(row=12, column=2, rowspan=7)
+
+        self.b_apply=Tkinter.Button(self.window, text="Apply filter",font=font, width=35,bg=color)
+        self.b_apply.grid(row=12, column=6, rowspan=7)
+        
+        self.b1 = Tkinter.Button(self.window, text="Gaussian", width=15,font=font,bg=color)
+        self.b1.grid(row=1, column=11)
+
+        self.b2 = Tkinter.Button(self.window, text="Laplace", width=15,font=font,bg=color)
+        self.b2.grid(row=1, column=15)
+
+        self.b3 = Tkinter.Button(self.window, text="Delta", width=15,font=font,bg=color)
+        self.b3.grid(row=3, column=11)
+
+
+        self.b4 = Tkinter.Button(self.window, text="Black & White", width=15,font=font,bg=color)
+        self.b4.grid(row=3, column=15)
+
+        self.b5 = Tkinter.Button(self.window, text="Red", width=15,font=font,bg=color)
+        self.b5.grid(row=5, column=11)
+
+        self.b6 = Tkinter.Button(self.window, text="Blue", width = 15,font=font,bg=color)
+        self.b6.grid(row=5, column= 15)
+
+        self.b7 = Tkinter.Button(self.window, text="Gray", width=15,font=font,bg=color)
+        self.b7.grid(row=7, column=11)
+
+        self.b8 = Tkinter.Button(self.window, text="Color/No Filter", width=15,font=font,bg=color)
+        self.b8.grid(row=7, column=15)
+
+        self.b9 = Tkinter.Button(self.window, text="Save image", command=self.explorer,font=font,bg=color)
+        self.b9.grid(row=9, rowspan=2, column = 11, columnspan=4)
+
+        self.b10= Tkinter.Button(self.window, text="Close Program", command = self.close,font=font,bg=color)
+        self.b10.grid(row=9, rowspan=2, column=15, columnspan=2)
+
+
+App(Tkinter.Tk(), 'FilterX')
+
+
